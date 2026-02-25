@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Medical Clinic — Appointments</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --sand:     #e8e0d4;  --sand-lt: #f2ede6;  --sand-dk: #d4c9b8;
+  --stone:    #2c2c27;  --stone-md:#4a4a42;  --stone-lt:#7a7a6e;
+  --moss:     #3a4a35;  --moss-lt: #4d6347;
+  --cream:    #faf7f2;  --white:   #ffffff;
+  --danger:   #8b3a3a;  --danger-bg:#f5ece8;
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans:  'Jost', system-ui, sans-serif;
+  --ease:  cubic-bezier(.4,0,.2,1);
+}
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--cream); color: var(--stone); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* Nav */
+nav { position:fixed; top:0; left:0; right:0; z-index:100; background:var(--cream); border-bottom:1px solid var(--sand-dk); display:flex; align-items:center; justify-content:space-between; padding:0 48px; height:64px; }
+.nav-logo { font-family:var(--serif); font-size:15px; letter-spacing:.08em; text-transform:uppercase; color:var(--stone); text-decoration:none; }
+.nav-book-btn { background:var(--moss); color:var(--cream); padding:10px 24px; border-radius:2px; font-size:11px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; text-decoration:none; transition:background .2s; }
+.nav-book-btn:hover { background:var(--moss-lt); }
+
+/* Hero */
+.hero { margin-top:64px; background:var(--sand-lt); padding:96px 96px; display:flex; flex-direction:column; justify-content:center; min-height:420px; }
+.hero-eyebrow { font-size:11px; font-weight:400; letter-spacing:.2em; text-transform:uppercase; color:var(--stone-lt); margin-bottom:20px; }
+.hero-title { font-family:var(--serif); font-size:clamp(36px,4vw,60px); line-height:1.1; font-weight:400; color:var(--stone); margin-bottom:24px; max-width:700px; }
+.hero-title em { font-style:italic; color:var(--moss); }
+.hero-body { font-size:15px; font-weight:300; line-height:1.7; color:var(--stone-md); max-width:480px; margin-bottom:40px; }
+.hero-btn { display:inline-flex; align-items:center; gap:10px; background:var(--stone); color:var(--cream); font-family:var(--sans); font-size:12px; font-weight:400; letter-spacing:.12em; text-transform:uppercase; padding:14px 28px; border:none; cursor:pointer; border-radius:2px; transition:background .2s var(--ease),transform .2s; align-self:flex-start; text-decoration:none; }
+.hero-btn:hover { background:var(--moss); transform:translateY(-1px); }
+.hero-btn svg { width:14px; height:14px; fill:currentColor; }
+
+/* Services */
+.services { background:var(--stone); padding:48px 64px; display:flex; gap:0; }
+.service-item { flex:1; padding:0 40px 0 0; border-right:1px solid rgba(255,255,255,.1); margin-right:40px; }
+.service-item:last-child { border-right:none; margin-right:0; }
+.service-num { font-size:10px; letter-spacing:.2em; color:rgba(250,247,242,.35); margin-bottom:12px; }
+.service-title { font-family:var(--serif); font-size:18px; color:var(--cream); margin-bottom:8px; }
+.service-desc { font-size:13px; font-weight:300; line-height:1.6; color:rgba(250,247,242,.55); }
+
+/* Chat section */
+.chat-section { padding:96px 64px; display:grid; grid-template-columns:1fr 1.4fr; gap:80px; align-items:start; }
+.chat-intro { position:sticky; top:88px; }
+.section-label { font-size:10px; font-weight:400; letter-spacing:.25em; text-transform:uppercase; color:var(--moss); margin-bottom:12px; }
+.chat-intro h2 { font-family:var(--serif); font-size:clamp(28px,3vw,40px); font-weight:400; line-height:1.2; margin-bottom:20px; }
+.chat-intro h2 em { font-style:italic; color:var(--stone-lt); }
+.chat-intro p { font-size:14px; font-weight:300; line-height:1.8; color:var(--stone-md); margin-bottom:32px; }
+.info-block { border-top:1px solid var(--sand-dk); padding-top:24px; display:flex; flex-direction:column; gap:16px; }
+.info-row { display:flex; gap:16px; align-items:flex-start; }
+.info-icon { width:32px; height:32px; background:var(--sand); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.info-icon svg { width:14px; height:14px; fill:var(--moss); }
+.info-text { font-size:13px; color:var(--stone-md); font-weight:300; line-height:1.5; }
+.info-text strong { font-weight:500; color:var(--stone); display:block; }
+
+/* Chat widget */
+.chat-widget { background:var(--white); border:1px solid var(--sand-dk); border-radius:4px; overflow:hidden; box-shadow:0 8px 48px rgba(44,44,39,.08); display:flex; flex-direction:column; height:660px; }
+.chat-header { background:var(--sand-lt); border-bottom:1px solid var(--sand-dk); padding:18px 24px; display:flex; align-items:center; gap:12px; }
+.chat-header-dot { width:8px; height:8px; background:var(--moss); border-radius:50%; animation:pulse 2.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.35;} }
+.chat-header-title { font-family:var(--serif); font-size:14px; color:var(--stone); }
+.chat-header-sub { font-size:11px; font-weight:300; letter-spacing:.08em; color:var(--stone-lt); margin-left:auto; }
+
+/* Messages */
+.chat-messages { flex:1; overflow-y:auto; padding:24px 20px; display:flex; flex-direction:column; gap:16px; background:var(--cream); scroll-behavior:smooth; }
+.chat-messages::-webkit-scrollbar { width:3px; }
+.chat-messages::-webkit-scrollbar-thumb { background:var(--sand-dk); border-radius:2px; }
+.msg-row { display:flex; gap:10px; align-items:flex-end; animation:fadeUp .3s var(--ease) both; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:none;} }
+.msg-row.bot  { justify-content:flex-start; }
+.msg-row.user { justify-content:flex-end; }
+.msg-avatar { width:28px; height:28px; background:var(--moss); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.msg-avatar svg { width:13px; height:13px; fill:var(--cream); }
+.msg-bubble { max-width:76%; padding:12px 16px; font-size:13.5px; line-height:1.6; word-break:break-word; border-radius:3px; }
+.msg-row.bot  .msg-bubble { background:var(--white); color:var(--stone); border:1px solid var(--sand-dk); border-bottom-left-radius:0; }
+.msg-row.user .msg-bubble { background:var(--stone); color:var(--cream); border-bottom-right-radius:0; font-weight:300; }
+.msg-bubble.emergency { background:var(--danger-bg); border:1.5px solid var(--danger); color:var(--danger); }
+.msg-bubble.emergency strong { display:block; font-size:15px; margin-bottom:6px; font-family:var(--serif); }
+
+/* Typing */
+.typing-dots { display:flex; align-items:center; gap:4px; padding:4px 2px; }
+.typing-dots span { width:6px; height:6px; background:var(--sand-dk); border-radius:50%; animation:tdot 1s infinite; }
+.typing-dots span:nth-child(2){animation-delay:.15s;} .typing-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes tdot { 0%,80%,100%{transform:translateY(0);} 40%{transform:translateY(-4px);} }
+
+/* Email card */
+.email-card { background:var(--sand-lt); border:1px solid var(--sand-dk); border-radius:3px; padding:16px; font-size:12.5px; width:100%; max-width:340px; }
+.email-card-label { font-size:9px; font-weight:500; letter-spacing:.2em; text-transform:uppercase; color:var(--stone-lt); margin-bottom:12px; }
+.email-field { display:flex; gap:8px; padding:5px 0; border-bottom:1px solid var(--sand-dk); line-height:1.4; }
+.email-field:last-of-type { border-bottom:none; }
+.ef { font-weight:500; min-width:52px; color:var(--stone-lt); font-size:11px; letter-spacing:.03em; }
+.ev { color:var(--stone); }
+.email-body { padding-top:10px; color:var(--stone); line-height:1.65; white-space:pre-wrap; font-size:12px; font-weight:300; }
+.copy-btn { margin-top:12px; width:100%; padding:9px; background:var(--stone); color:var(--cream); border:none; border-radius:2px; font-size:11px; font-family:var(--sans); font-weight:400; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; transition:background .2s; }
+.copy-btn:hover { background:var(--moss); }
+.copy-btn.done { background:var(--moss); }
+
+/* Chips */
+.chip-row { display:flex; flex-wrap:wrap; gap:8px; padding-left:38px; animation:fadeUp .3s .08s var(--ease) both; }
+.chip { background:var(--cream); border:1px solid var(--sand-dk); color:var(--stone-md); padding:7px 16px; font-size:12px; font-family:var(--sans); font-weight:400; letter-spacing:.05em; border-radius:2px; cursor:pointer; transition:background .18s,color .18s,border-color .18s,transform .15s; white-space:nowrap; }
+.chip:hover { background:var(--stone); color:var(--cream); border-color:var(--stone); transform:translateY(-1px); }
+.chip.danger { border-color:var(--danger); color:var(--danger); }
+.chip.danger:hover { background:var(--danger); color:var(--white); }
+
+/* Input bar */
+.chat-inputbar { border-top:1px solid var(--sand-dk); background:var(--white); padding:14px 16px; display:flex; gap:10px; align-items:center; }
+.chat-inputbar input { flex:1; border:1px solid var(--sand-dk); border-radius:2px; padding:10px 14px; font-size:13px; font-family:var(--sans); font-weight:300; color:var(--stone); background:var(--cream); outline:none; transition:border-color .18s; }
+.chat-inputbar input::placeholder { color:var(--stone-lt); opacity:.7; }
+.chat-inputbar input:focus { border-color:var(--moss); background:var(--white); }
+.send-btn { width:38px; height:38px; background:var(--stone); border:none; border-radius:2px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:background .18s,transform .15s; }
+.send-btn:hover { background:var(--moss); transform:scale(1.04); }
+.send-btn svg { width:15px; height:15px; fill:var(--cream); }
+
+/* Responsive */
+@media (max-width:900px) {
+  nav { padding:0 24px; }
+  .hero { padding:48px 24px; }
+  .services { padding:36px 24px; flex-direction:column; gap:24px; }
+  .service-item { border-right:none; padding-right:0; margin-right:0; border-bottom:1px solid rgba(255,255,255,.08); padding-bottom:24px; }
+  .service-item:last-child { border-bottom:none; padding-bottom:0; }
+  .chat-section { grid-template-columns:1fr; gap:40px; padding:48px 24px; }
+  .chat-intro { position:static; }
+  .chat-widget { height:580px; }
+}
+
+/* Appointment card */
+.appt-card { background:var(--sand-lt); border:1px solid var(--sand-dk); border-radius:3px; padding:16px; width:100%; max-width:340px; }
+.appt-row { display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--sand-dk); }
+.appt-row:last-child { border-bottom:none; padding-bottom:0; }
+.appt-num { width:24px; height:24px; background:var(--moss); color:var(--cream); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:500; flex-shrink:0; margin-top:2px; }
+.appt-type { font-size:13px; font-weight:500; color:var(--stone); margin-bottom:3px; }
+.appt-meta { font-size:11.5px; color:var(--stone-lt); font-weight:300; line-height:1.5; }
+</style>
+</head>
+<body>
+
+<!-- Nav: logo + Book Now only -->
+<nav>
+  <a class="nav-logo" href="#">Medical Clinic</a>
+  <a href="#chat" class="nav-book-btn">Book Now</a>
+</nav>
+
+<!-- Hero: full width, no right panel -->
+<section class="hero">
+  <p class="hero-eyebrow">Trusted care, every visit</p>
+  <h1 class="hero-title">Your health,<br><em>our priority</em></h1>
+  <p class="hero-body">Book, reschedule, or cancel your appointment online in minutes. Our team is here to make your experience simple and comfortable.</p>
+  <a href="#chat" class="hero-btn">Book an Appointment <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+</section>
+
+<!-- Services strip -->
+<section class="services">
+  <div class="service-item"><div class="service-num">01</div><div class="service-title">Book Appointment</div><div class="service-desc">Schedule a new visit with one of our medical professionals at a time that suits you.</div></div>
+  <div class="service-item"><div class="service-num">02</div><div class="service-title">Reschedule</div><div class="service-desc">Need to move your appointment? Find a better time instantly through our assistant.</div></div>
+  <div class="service-item"><div class="service-num">03</div><div class="service-title">Cancel</div><div class="service-desc">Plans changed? Cancel easily and our team will help you rebook when you're ready.</div></div>
+  <div class="service-item"><div class="service-num">04</div><div class="service-title">Procedure Prep</div><div class="service-desc">Request prep instructions for an upcoming visit.</div></div>
+  <div class="service-item"><div class="service-num">05</div><div class="service-title">Emergency</div><div class="service-desc">For urgent situations our assistant will immediately direct you to emergency services.</div></div>
+</section>
+
+<!-- Chat section -->
+<section class="chat-section" id="chat">
+  <div class="chat-intro">
+    <p class="section-label">Appointment Assistant</p>
+    <h2>How can we <em>help you</em> today?</h2>
+    <p>Chat with our assistant below. We'll collect your details and draft an email to our team — you review it before anything is sent.</p>
+    <div class="info-block">
+      <div class="info-row">
+        <div class="info-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>
+        <div class="info-text"><strong>Dartmouth, Nova Scotia</strong>123 Health Street, Suite 200</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div>
+        <div class="info-text"><strong>Phone</strong>(902) 555-0100</div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg></div>
+        <div class="info-text"><strong>Hours</strong>Mon – Fri, 8:00 AM – 5:00 PM</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-widget">
+    <div class="chat-header">
+      <div class="chat-header-dot"></div>
+      <span class="chat-header-title">Appointment Assistant</span>
+      <span class="chat-header-sub">Powered by GPT-4o-mini</span>
+    </div>
+    <div class="chat-messages" id="messages"></div>
+    <div class="chat-inputbar">
+      <input type="text" id="userInput" placeholder="Type your message…" autocomplete="off" />
+      <button class="send-btn" onclick="handleSend()" title="Send">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────
+const API          = 'http://localhost:8080/api';
+const CLINIC_NAME  = 'Medical Clinic';
+const CLINIC_EMAIL = 'appointments@medicalclinic.com';
+const EMERGENCY_RE = /\b(emergency|urgent|heart attack|chest pain|stroke|dying|can't breathe|bleeding|unconscious|911|severe pain|collapsed|seizure|overdose|not breathing)\b/i;
+
+// ── Conversation state ────────────────────────────────────────────
+let stage  = 'menu';
+let intent = null;
+let patient = { name:'', phone:'', day:'', time:'' };
+let patientAppointments = [];
+let selectedAppointment = null;
+
+// ── DOM helpers ───────────────────────────────────────────────────
+const msgs  = document.getElementById('messages');
+const input = document.getElementById('userInput');
+const scroll  = () => setTimeout(() => msgs.scrollTo({top:msgs.scrollHeight,behavior:'smooth'}), 40);
+const esc     = s  => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const AVATAR  = `<div class="msg-avatar"><svg viewBox="0 0 48 48"><path d="M24 14v20M14 24h20" stroke="rgba(250,247,242,0.85)" stroke-width="1.5" stroke-linecap="round"/></svg></div>`;
+
+function addMsg(html, role, cls='') {
+  const row = document.createElement('div');
+  row.className = `msg-row ${role}`;
+  row.innerHTML = role === 'bot'
+    ? `${AVATAR}<div class="msg-bubble ${cls}">${html}</div>`
+    : `<div class="msg-bubble">${esc(html)}</div>`;
+  msgs.appendChild(row);
+  scroll();
+}
+
+function addTyping() {
+  const row = document.createElement('div');
+  row.className = 'msg-row bot'; row.id = 'typing';
+  row.innerHTML = `${AVATAR}<div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(row); scroll();
+}
+const removeTyping = () => document.getElementById('typing')?.remove();
+const removeChips  = () => document.getElementById('chips')?.remove();
+
+function botReply(html, cls='', delay=500) {
+  return new Promise(res => {
+    addTyping();
+    setTimeout(() => { removeTyping(); addMsg(html, 'bot', cls); res(); }, delay);
+  });
+}
+
+function addChips(options) {
+  removeChips();
+  const row = document.createElement('div');
+  row.className = 'chip-row'; row.id = 'chips';
+  options.forEach(({label, value, danger}) => {
+    const b = document.createElement('button');
+    b.className = `chip${danger ? ' danger' : ''}`;
+    b.textContent = label;
+    b.onclick = () => { removeChips(); handleInput(value, true); };
+    row.appendChild(b);
+  });
+  msgs.appendChild(row); scroll();
+}
+
+function addAppointmentCard(appointments) {
+  const row = document.createElement('div');
+  row.className = 'msg-row bot';
+  let rows = appointments.map((a, i) => `
+    <div class="appt-row">
+      <div class="appt-num">${i + 1}</div>
+      <div class="appt-details">
+        <div class="appt-type">${a.type}</div>
+        <div class="appt-meta">${a.date} &nbsp;·&nbsp; ${a.time}</div>
+        <div class="appt-meta">${a.doctor}</div>
+      </div>
+    </div>`).join('');
+  row.innerHTML = `
+    <div style="width:28px;flex-shrink:0"></div>
+    <div class="appt-card">
+      <div class="email-card-label">📋 Your Appointments</div>
+      ${rows}
+    </div>`;
+  msgs.appendChild(row);
+  scroll();
+}
+
+function addEmailCard(subject, body) {
+  const id  = 'ec_' + Date.now();
+  const row = document.createElement('div');
+  row.className = 'msg-row bot';
+  row.innerHTML = `
+    <div style="width:28px;flex-shrink:0"></div>
+    <div class="email-card">
+      <div class="email-card-label">✉ Draft Email — GPT-4o-mini</div>
+      <div class="email-field"><span class="ef">To</span><span class="ev">${CLINIC_EMAIL}</span></div>
+      <div class="email-field"><span class="ef">Subject</span><span class="ev">${esc(subject)}</span></div>
+      <div class="email-field"><span class="ef">Name</span><span class="ev">${esc(patient.name)}</span></div>
+      <div class="email-field"><span class="ef">Phone</span><span class="ev">${esc(patient.phone)}</span></div>
+      <div class="email-body">${esc(body)}</div>
+      <button class="copy-btn" id="${id}" onclick="copyEmail(this)">Copy to Clipboard</button>
+    </div>`;
+  row.dataset.subject = subject;
+  row.dataset.body    = body;
+  msgs.appendChild(row); scroll();
+}
+
+function copyEmail(btn) {
+  const card    = btn.closest('.email-card');
+  const subject = btn.closest('.msg-row').dataset.subject;
+  const body    = btn.closest('.msg-row').dataset.body;
+  navigator.clipboard?.writeText(`To: ${CLINIC_EMAIL}\nSubject: ${subject}\n\n${body}`)
+    .then(() => {
+      btn.textContent = '✓ Copied';
+      btn.classList.add('done');
+      setTimeout(() => { btn.textContent = 'Copy to Clipboard'; btn.classList.remove('done'); }, 2500);
+    });
+}
+
+// ── API calls to backend ──────────────────────────────────────────
+async function callChat(message) {
+  const res = await fetch(`${API}/chat`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({message})
+  });
+  return await res.json();
+}
+
+async function callEmail(data) {
+  const res = await fetch(`${API}/email`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data)
+  });
+  return await res.json();
+}
+
+
+async function callAppointments(name) {
+  const res = await fetch(`${API}/appointments`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({name})
+  });
+  return await res.json();
+}
+
+async function callUpdateAppointment(name, appointment_id, new_date, new_time) {
+  const res = await fetch(`${API}/appointments/update`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({name, appointment_id, new_date, new_time})
+  });
+  return await res.json();
+}
+
+// ── Main conversation handler ─────────────────────────────────────
+async function handleInput(text, fromChip=false) {
+  if (!text.trim()) return;
+  removeChips();
+  addMsg(fromChip ? text.replace(/^[📅🔄❌🚨]\s*/, '') : text, 'user');
+  input.value = '';
+  input.disabled = true;
+
+  const t = text.trim().toLowerCase();
+
+  // Emergency — fires at any stage
+  if (EMERGENCY_RE.test(text)) {
+    stage = 'menu';
+    await botReply(
+      `<strong>🚨 Please Call 911 Immediately</strong>` +
+      `If this is a medical emergency, call <strong>911</strong> now ` +
+      `or go to your nearest emergency room.<br><br>` +
+      `This assistant cannot dispatch emergency services.<br><br>` +
+      `<em>Once you are safe, we can help you book a follow-up.</em>`,
+      'emergency', 350
+    );
+    addChips([{label:'📅 Book a follow-up', value:'book'}, {label:'↩ Menu', value:'menu'}]);
+    input.disabled = false;
+    return;
+  }
+
+  switch(stage) {
+
+    case 'menu': {
+      if (['book','cancel','reschedule','prep'].includes(t)) {
+        intent = t;
+        stage  = 'name';
+        if (t === 'prep') {
+        stage = 'prep_type';
+        await botReply(`I can help with preparation instructions.<br><br>What procedure are you preparing for? (e.g. <strong>MRI</strong>, <strong>colonoscopy</strong>, <strong>blood test</strong>, <strong>CT scan</strong>)`);
+        break;
+      }
+      const verb = t === 'book' ? 'book' : t === 'cancel' ? 'cancel' : 'reschedule';
+        await botReply(`I can help you <strong>${verb} an appointment</strong>.<br><br>What is your <strong>full name</strong>?`);
+      } else if (t === 'menu') {
+        await showMenu();
+      } else {
+        // Send to LangGraph backend for intent detection
+        addTyping();
+        try {
+          const data = await callChat(text);
+          removeTyping();
+          if (data.intent && data.intent !== 'unknown') {
+            intent = data.intent;
+            stage  = 'name';
+            await botReply(`I can help you <strong>${intent} an appointment</strong>.<br><br>What is your <strong>full name</strong>?`);
+          } else {
+            await botReply(data.reply || `What would you like to do?`);
+            addChips([{label:'📅 Book',value:'book'},{label:'🔄 Reschedule',value:'reschedule'},{label:'❌ Cancel',value:'cancel'}]);
+          }
+        } catch(e) {
+          removeTyping();
+          await botReply(`What would you like to do?`);
+          addChips([{label:'📅 Book',value:'book'},{label:'🔄 Reschedule',value:'reschedule'},{label:'❌ Cancel',value:'cancel'}]);
+        }
+      }
+      break;
+    }
+
+    case 'name':
+      if (text.trim().length < 2) { await botReply('Please enter your full name.'); break; }
+      patient.name = text.trim().split(' ').map(w => w[0].toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+
+      // For reschedule — look up existing appointments first
+      if (intent === 'reschedule') {
+        addTyping();
+        try {
+          const result = await callAppointments(patient.name);
+          removeTyping();
+          if (result.found && result.appointments.length > 0) {
+            patientAppointments = result.appointments;
+            // Show appointment list card
+            addAppointmentCard(result.appointments);
+            await botReply(`I found <strong>${result.appointments.length} appointment${result.appointments.length > 1 ? 's' : ''}</strong> under <strong>${patient.name}</strong>.<br><br>Which appointment would you like to reschedule? Reply with the <strong>number</strong> (e.g. 1, 2).`, '', 300);
+            stage = 'select_appointment';
+          } else {
+            await botReply(`I couldn't find any appointments under <strong>${patient.name}</strong>. Let's book a new one instead.<br><br>What is your <strong>phone number</strong>?`);
+            intent = 'book';
+            stage = 'phone';
+          }
+        } catch(e) {
+          removeTyping();
+          await botReply(`Thanks, <strong>${patient.name}</strong>! What is your <strong>phone number</strong>?`);
+          stage = 'phone';
+        }
+        break;
+      }
+
+      stage = 'phone';
+      await botReply(`Thanks, <strong>${patient.name}</strong>! What is your <strong>phone number</strong>?`);
+      break;
+
+    case 'phone': {
+      const d = text.replace(/\D/g, '');
+      if (d.length < 7) { await botReply('Please enter a valid phone number (e.g. 902-555-0123).'); break; }
+      patient.phone = d.length === 10 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`
+                    : d.length === 11 ? `+${d[0]} (${d.slice(1,4)}) ${d.slice(4,7)}-${d.slice(7)}`
+                    : text.trim();
+      stage = 'day';
+      await botReply(intent === 'cancel'
+        ? `What <strong>date</strong> is the appointment you want to cancel?`
+        : `What is your <strong>preferred day</strong>? (e.g. next Monday, March 5)`);
+      break;
+    }
+
+    case 'day':
+      if (text.trim().length < 2) { await botReply('Please enter a preferred day or date.'); break; }
+      patient.day = text.trim();
+      stage = 'time';
+      await botReply(intent === 'cancel'
+        ? `And what <strong>time</strong> was that appointment?`
+        : `What is your <strong>preferred time</strong>? (e.g. 10:00 AM, afternoon)`);
+      break;
+
+    case 'time': {
+      if (text.trim().length < 2) { await botReply('Please enter a preferred time.'); break; }
+      patient.time = text.trim();
+      stage = 'review';
+      await botReply(`Drafting your email with GPT-4o-mini…`, '', 200);
+      try {
+        const email = await callEmail({
+          intent,
+          name:  patient.name,
+          phone: patient.phone,
+          day:   patient.day,
+          time:  patient.time
+        });
+        addEmailCard(email.subject, email.body);
+        await botReply(
+          `Does this look correct?<br>` +
+          `<small style="color:var(--stone-lt)">Reply <strong>yes</strong> to submit or <strong>no</strong> to start over.</small>`,
+          '', 300
+        );
+        addChips([{label:'✓ Yes, send it', value:'yes'}, {label:'✗ No, start over', value:'no'}]);
+      } catch(e) {
+        await botReply(`There was a problem drafting the email. Please try again.`);
+        stage = 'menu';
+      }
+      break;
+    }
+
+    case 'review': {
+      const yes = /\b(yes|y|send|confirm|looks good|correct|ok|sure|yeah|yep)\b/i.test(t);
+      const no  = /\b(no|n|edit|change|redo|wrong|restart)\b/i.test(t);
+      if (yes) {
+        stage = 'done';
+        await botReply(
+          `✓ <strong>Request submitted.</strong><br><br>` +
+          `Your email has been sent to <strong>${CLINIC_EMAIL}</strong>. ` +
+          `A team member will contact <strong>${patient.name}</strong> at <strong>${patient.phone}</strong> to confirm.<br><br>` +
+          `Is there anything else I can help with?`,
+          '', 600
+        );
+        addChips([{label:'📅 Book another',value:'book'},{label:'🔄 Reschedule',value:'reschedule'},{label:'❌ Cancel',value:'cancel'}]);
+        patient = {name:'',phone:'',day:'',time:''}; intent = null;
+      } else if (no) {
+        stage = 'menu'; patient = {name:'',phone:'',day:'',time:''}; intent = null;
+        await botReply(`No problem — let's start over. What would you like to do?`);
+        addChips([{label:'📅 Book',value:'book'},{label:'🔄 Reschedule',value:'reschedule'},{label:'❌ Cancel',value:'cancel'}]);
+      } else {
+        await botReply(`Please reply <strong>yes</strong> to send or <strong>no</strong> to start over.`);
+        addChips([{label:'✓ Yes, send it',value:'yes'},{label:'✗ No, start over',value:'no'}]);
+      }
+      break;
+    }
+
+    case 'select_appointment': {
+      const num = parseInt(text.trim());
+      if (isNaN(num) || num < 1 || num > patientAppointments.length) {
+        await botReply(`Please reply with a number between 1 and ${patientAppointments.length}.`);
+        break;
+      }
+      selectedAppointment = patientAppointments[num - 1];
+      stage = 'reschedule_date';
+      await botReply(`You selected:<br><strong>${selectedAppointment.type}</strong> — ${selectedAppointment.date} at ${selectedAppointment.time} with ${selectedAppointment.doctor}<br><br>What is the <strong>new date</strong> you'd like? (e.g. March 25, next Tuesday)`);
+      break;
+    }
+
+    case 'reschedule_date':
+      if (text.trim().length < 2) { await botReply('Please enter a new date.'); break; }
+      patient.day = text.trim();
+      stage = 'reschedule_time';
+      await botReply(`What is the <strong>new time</strong> you'd prefer? (e.g. 10:00 AM, afternoon)`);
+      break;
+
+    case 'reschedule_time': {
+      if (text.trim().length < 2) { await botReply('Please enter a new time.'); break; }
+      patient.time = text.trim();
+      stage = 'review';
+
+      // Update appointment in database
+      addTyping();
+      try {
+        await callUpdateAppointment(patient.name, selectedAppointment.id, patient.day, patient.time);
+        removeTyping();
+      } catch(e) { removeTyping(); }
+
+      // Generate email draft
+      await botReply(`Drafting your reschedule confirmation email…`, '', 200);
+      try {
+        const email = await callEmail({
+          intent: 'reschedule',
+          name:   patient.name,
+          phone:  selectedAppointment.phone,
+          day:    patient.day,
+          time:   patient.time
+        });
+        addEmailCard(email.subject, email.body);
+        await botReply(
+          `Does this look correct?<br>` +
+          `<small style="color:var(--stone-lt)">Reply <strong>yes</strong> to confirm or <strong>no</strong> to start over.</small>`,
+          '', 300
+        );
+        addChips([{label:'✓ Yes, confirm', value:'yes'}, {label:'✗ No, start over', value:'no'}]);
+      } catch(e) {
+        await botReply(`There was a problem drafting the email. Please try again.`);
+        stage = 'menu';
+      }
+      break;
+    }
+
+    case 'done':
+      stage = 'menu'; patient = {name:'',phone:'',day:'',time:''}; intent = null;
+      handleInput(text, false);
+      return;
+
+    case 'prep_type': {
+      addTyping();
+      try {
+        const data = await callChat(`What are the preparation instructions for ${text}?`);
+        removeTyping();
+        await botReply(data.reply || `Please contact the clinic directly for preparation instructions.`);
+      } catch(e) {
+        removeTyping();
+        await botReply(`Please contact the clinic directly for preparation instructions at ${CLINIC_EMAIL}.`);
+      }
+      stage = 'menu';
+      addChips([{label:'📅 Book an appointment',value:'book'},{label:'🔄 Reschedule',value:'reschedule'},{label:'❌ Cancel',value:'cancel'},{label:'ℹ️ Prep Instructions',value:'prep'},{label:'🚨 Emergency',value:'emergency',danger:true}]);
+      break;
+    }
+  }
+
+  input.disabled = false;
+  input.focus();
+}
+
+async function showMenu() {
+  await botReply(`What would you like to do today?`, '', 300);
+  addChips([
+    {label:'📅 Book an appointment', value:'book'},
+    {label:'🔄 Reschedule',          value:'reschedule'},
+    {label:'❌ Cancel',              value:'cancel'},
+    {label:'ℹ️ Prep Instructions',value:'prep'},
+    {label:'🚨 Emergency',           value:'emergency', danger:true},
+  ]);
+}
+
+function handleSend() {
+  const v = input.value.trim();
+  if (v) { removeChips(); handleInput(v); }
+}
+input.addEventListener('keydown', e => { if (e.key === 'Enter') handleSend(); });
+document.querySelector('.hero-btn').addEventListener('click', e => {
+  e.preventDefault();
+  document.getElementById('chat').scrollIntoView({behavior:'smooth'});
+});
+
+// Boot
+(async () => {
+  await botReply(`Welcome to <strong>${CLINIC_NAME}</strong>. How can I help you today?`, '', 400);
+  addChips([
+    {label:'📅 Book an appointment', value:'book'},
+    {label:'🔄 Reschedule',          value:'reschedule'},
+    {label:'❌ Cancel',              value:'cancel'},
+    {label:'ℹ️ Prep Instructions',value:'prep'},
+    {label:'🚨 Emergency',           value:'emergency', danger:true},
+  ]);
+})();
+</script>
+</body>
+</html>
